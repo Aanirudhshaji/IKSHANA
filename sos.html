@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SOS System</title>
+</head>
+<body>
+  <h1>Emergency SOS System</h1>
+  <button id="sosButton">Send SOS</button>
+  <p id="message"></p>
+
+  <script>
+    const sosButton = document.getElementById("sosButton");
+    const messageText = document.getElementById("message");
+
+    sosButton.addEventListener("click", function() {
+      const confirmSend = confirm("Are you sure you want to send an SOS?");
+      if (confirmSend) {
+        navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+      }
+    });
+
+    function successCallback(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      // Replace with your preferred map service
+      const mapLink = `https://maps.google.com/?q=${latitude},${longitude}`;
+
+      const message = `Emergency! User located at: ${mapLink}`;
+
+      // Send data to server-side script using AJAX or form submission
+      sendDataToServer(message, latitude, longitude);
+    }
+
+    function errorCallback(error) {
+      console.error(error);
+      messageText.textContent = "Error: Could not get your location.";
+    }
+
+    function sendDataToServer(message, latitude, longitude) {
+      // Replace with your AJAX request or form submission logic
+      const xhr = new XMLHttpRequest(); // For AJAX
+      xhr.open("POST", "send_sos.php"); // Replace with your server-side script path
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          messageText.textContent = "SOS sent successfully!";
+        } else {
+          messageText.textContent = "Error sending SOS: " + xhr.statusText;
+        }
+      };
+      const data = `message=${message}&latitude=${latitude}&longitude=${longitude}`;
+      xhr.send(data);
+    }
+  </script>
+</body>
+</html>
